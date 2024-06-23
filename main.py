@@ -1,23 +1,43 @@
-import pyqrcode
+import qrcode
 import base64
 import uuid
 import os
+
+def split_binary_data(binary_data, chunk_size=2593):
+    # Calculate the number of full chunks
+    num_full_chunks = len(binary_data) // chunk_size
+    # Calculate the size of the remaining part
+    remainder = len(binary_data) % chunk_size
+
+    # Create a list to hold the chunks
+    chunks = []
+
+    # Append the full chunks to the list
+    for i in range(num_full_chunks):
+        chunks.append(binary_data[i*chunk_size : (i+1)*chunk_size])
+
+    # Append the remaining part to the list
+    if remainder > 0:
+        chunks.append(binary_data[-remainder:])
+
+    return chunks
 
 file_path = "sample\MtFuji.jpg"
 
 with open(file_path,mode="rb") as f:
     data = f.read()
 
-chunk_size = 954 #max
-binary_chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+
+binary_chunks = split_binary_data(data)
 dirname = "output/"+str(uuid.uuid4())
 os.mkdir(dirname)
 data_length = len(binary_chunks)
 
 for i in range(data_length):
-    encoded_data = base64.b64encode(binary_chunks[i]).decode('utf-8')
+    # encoded_data = base64.b64encode(binary_chunks[i]).decode('utf-8')
     # print(encoded_data)
-    code = pyqrcode.create(encoded_data)
-    code.png(f"{dirname}/{i+1}of{data_length}.png", scale=5, module_color=[0, 0, 0, 128], background=[255, 255, 255])
+    code = qrcode.make(binary_chunks[i],error_correction=qrcode.constants.ERROR_CORRECT_L)
+    code.save(f"{dirname}/{i+1}of{data_length}.png")
     print(f"{i+1}of{data_length}")
+    print(len(binary_chunks[i]))
 
