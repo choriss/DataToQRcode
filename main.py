@@ -3,7 +3,7 @@ import base64
 import uuid
 import os
 
-def split_binary_data(binary_data, chunk_size=2593):
+def split_binary_data(binary_data, chunk_size=256):
     # Calculate the number of full chunks
     num_full_chunks = len(binary_data) // chunk_size
     # Calculate the size of the remaining part
@@ -37,7 +37,6 @@ for i in range(data_length):
     # encoded_data = base64.b64encode(binary_chunks[i]).decode('utf-8')
     # print(encoded_data)
     code = qrcode.make(binary_chunks[i],error_correction=qrcode.constants.ERROR_CORRECT_L)
-    code.save(f"{dirname}/{i+1}of{data_length}.png")
-    print(f"{i+1}of{data_length}")
+    code.save(f"{dirname.zfill(len(str()))}/{str(i+1).zfill(len(str(data_length)))}.png")
     print(len(binary_chunks[i]))
 
